@@ -1,0 +1,66 @@
+[
+  {
+    "id": 1,
+    "title": "The Midnight Library",
+    "author": "Matt Haig",
+    "category": "Fiction",
+    "status": "Available",
+    "color": "#b86d52"
+  },
+  {
+    "id": 2,
+    "title": "Atomic Habits",
+    "author": "James Clear",
+    "category": "Personal growth",
+    "status": "Available",
+    "color": "#3e6a61"
+  },
+  {
+    "id": 3,
+    "title": "Pride and Prejudice",
+    "author": "Jane Austen",
+    "category": "Classics",
+    "status": "Reserved",
+    "color": "#6c6588"
+  },
+  {
+    "id": 4,
+    "title": "Clean Code",
+    "author": "Robert C. Martin",
+    "category": "Technology",
+    "status": "Available",
+    "color": "#426782"
+  },
+  {
+    "id": 5,
+    "title": "The Hobbit",
+    "author": "J. R. R. Tolkien",
+    "category": "Fantasy",
+    "status": "On loan",
+    "color": "#9b8555"
+  },
+  {
+    "id": 6,
+    "title": "Educated",
+    "author": "Tara Westover",
+    "category": "Biography",
+    "status": "Available",
+    "color": "#a45c65"
+  },
+  {
+    "id": 7,
+    "title": "1984",
+    "author": "George Orwell",
+    "category": "Classics",
+    "status": "Available",
+    "color": "#52634c"
+  },
+  {
+    "id": 8,
+    "title": "Deep Work",
+    "author": "Cal Newport",
+    "category": "Personal growth",
+    "status": "Available",
+    "color": "#687d93"
+  }
+]
