@@ -1,9 +1,13 @@
 backend/logs/*
 !backend/logs/.gitkeep
+
 .env
 .env.*
 !.env.example
+
+backend/config/.env
 backend/config/config.php
+
 vendor/
 node_modules/
 .DS_Store
