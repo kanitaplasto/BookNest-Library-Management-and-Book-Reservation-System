@@ -1,0 +1,13 @@
+{
+    "name": "booknest/library-management",
+    "description": "BookNest Library Management and Book Reservation System REST API",
+    "type": "project",
+    "require": {
+        "php": ">=8.1",
+        "ext-curl": "*",
+        "ext-mbstring": "*",
+        "ext-pdo": "*",
+        "ext-pdo_mysql": "*",
+        "flightphp/core": "^3.0"
+    }
+}

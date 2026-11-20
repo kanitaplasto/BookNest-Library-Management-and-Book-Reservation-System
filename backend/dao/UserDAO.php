@@ -47,17 +47,30 @@ class UserDAO extends BaseDAO
 
     public function update($id, $data)
     {
-        $sql = "UPDATE users
-                SET full_name = ?, email = ?, role = ?
-                WHERE id = ?";
+        if (isset($data['password']) && $data['password'] !== '') {
+            $sql = "UPDATE users
+                    SET full_name = ?, email = ?, role = ?, password = ?
+                    WHERE id = ?";
+            $parameters = [
+                $data['full_name'],
+                $data['email'],
+                $data['role'],
+                password_hash($data['password'], PASSWORD_DEFAULT),
+                $id
+            ];
+        } else {
+            $sql = "UPDATE users
+                    SET full_name = ?, email = ?, role = ?
+                    WHERE id = ?";
+            $parameters = [
+                $data['full_name'],
+                $data['email'],
+                $data['role'],
+                $id
+            ];
+        }
 
-        $statement = $this->executeQuery($sql, [
-            $data['full_name'],
-            $data['email'],
-            $data['role'],
-            $id
-        ]);
-
+        $statement = $this->executeQuery($sql, $parameters);
         return $statement->rowCount();
     }
 

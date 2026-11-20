@@ -1,3 +1,33 @@
+CREATE DATABASE IF NOT EXISTS `booknest_db`
+    CHARACTER SET utf8mb4
+    COLLATE utf8mb4_unicode_ci;
+
+USE `booknest_db`;
+SET NAMES utf8mb4;
+
+-- BookNest - Library Management and Book Reservation System
+-- Milestones 2 and 3: schema plus demonstration data.
+-- IMPORTANT: This is a fresh-install script. It drops and recreates the six
+-- BookNest tables. Back up an existing database before importing this file.
+
+SET FOREIGN_KEY_CHECKS = 0;
+DROP TABLE IF EXISTS `reservations`;
+DROP TABLE IF EXISTS `loans`;
+DROP TABLE IF EXISTS `books`;
+DROP TABLE IF EXISTS `authors`;
+DROP TABLE IF EXISTS `categories`;
+DROP TABLE IF EXISTS `users`;
+SET FOREIGN_KEY_CHECKS = 1;
+
+CREATE TABLE `users` (
+    `id` INT NOT NULL AUTO_INCREMENT,
+    `full_name` VARCHAR(100) NOT NULL,
+    `email` VARCHAR(150) NOT NULL,
+    `password` VARCHAR(255) NOT NULL,
+    `role` ENUM('member', 'librarian') NOT NULL DEFAULT 'member',
+    `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `unique_user_email` (`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `categories` (
@@ -38,7 +68,8 @@ CREATE TABLE `books` (
         FOREIGN KEY (`author_id`) REFERENCES `authors` (`id`)
         ON DELETE SET NULL ON UPDATE CASCADE,
     CONSTRAINT `chk_books_total_copies` CHECK (`total_copies` >= 0),
-    CONSTRAINT `chk_books_available_copies` CHECK (`available_copies` >= 0 AND `available_copies` <= `total_copies`)
+    CONSTRAINT `chk_books_available_copies`
+        CHECK (`available_copies` >= 0 AND `available_copies` <= `total_copies`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `loans` (
@@ -78,51 +109,58 @@ CREATE TABLE `reservations` (
         ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Sample users.
--- These are demo accounts only. Password hash below is PHP's documented
--- example bcrypt hash for the password "password"; replace for real accounts.
+-- Demonstration accounts. The hash is for the sample password "password".
+-- Replace these credentials before using the application outside a local demo.
 INSERT INTO `users` (`id`, `full_name`, `email`, `password`, `role`) VALUES
 (3, 'Kanita Plasto', 'kanita@example.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'member'),
 (4, 'BookNest Librarian', 'librarian@example.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'librarian');
 
+-- Category IDs match the values observed in the running BookNest database.
 INSERT INTO `categories` (`id`, `name`, `description`) VALUES
-(4, 'Fantasy', 'Fantasy and magical stories'),
-(5, 'Classic Literature', 'Classic literary works'),
-(6, 'Mystery', 'Mystery and detective fiction'),
-(7, 'Science Fiction', 'Science fiction and speculative stories');
+(4, 'Bosnian Literature', 'Literary works by Bosnian authors and regional classics.'),
+(5, 'Croatian Literature', 'Literary works by Croatian authors.'),
+(6, 'Serbian Literature', 'Literary works by Serbian authors.'),
+(7, 'Regional Classics', 'Regional classics and well-known works for younger readers.');
 
+-- Author IDs match the author_id values in the observed books API response.
 INSERT INTO `authors` (`id`, `first_name`, `last_name`, `biography`) VALUES
-(4, 'J. R. R.', 'Tolkien', 'English writer known for fantasy literature'),
-(5, 'Ivo', 'Andrić', 'Nobel Prize-winning writer from Bosnia and Herzegovina'),
-(6, 'Agatha', 'Christie', 'British mystery novelist'),
-(7, 'George', 'Orwell', 'English novelist and essayist'),
-(8, 'Frank', 'Herbert', 'American science fiction author'),
-(9, 'Meša', 'Selimović', 'Bosnian novelist'),
-(10, 'Jane', 'Austen', 'English novelist'),
-(11, 'Isaac', 'Asimov', 'Science fiction author');
+(4, 'Meša', 'Selimović', 'Bosnian novelist, author of Derviš i smrt and Tvrđava.'),
+(5, 'Ivo', 'Andrić', 'Nobel Prize-winning author of Na Drini ćuprija and Prokleta avlija.'),
+(6, 'Branko', 'Ćopić', 'Bosnian and Yugoslav writer known for prose and literature for younger readers.'),
+(7, 'Miroslav', 'Krleža', 'Croatian writer, playwright and essayist.'),
+(8, 'Ante', 'Kovačić', 'Croatian novelist and writer.'),
+(9, 'Miloš', 'Crnjanski', 'Serbian novelist, poet and essayist.'),
+(10, 'Dobrica', 'Ćosić', 'Serbian novelist and essayist.'),
+(11, 'Milorad', 'Pavić', 'Serbian writer and literary scholar, author of Hazarski rečnik.');
 
+-- The ten title records below mirror the last observed live GET /api/books
+-- response (IDs 15-24), including ISBNs, author/category references and copy counts.
 INSERT INTO `books`
-(`id`, `title`, `isbn`, `publication_year`, `description`, `total_copies`, `available_copies`, `category_id`, `author_id`) VALUES
-(15, 'Derviš i smrt', '9789958614001', 1966, 'Roman Meše Selimovića', 3, 2, 5, 9),
-(16, 'The Hobbit', '9780547928227', 1937, 'A fantasy adventure by J. R. R. Tolkien', 4, 3, 4, 4),
-(17, 'Murder on the Orient Express', '9780062693662', 1934, 'A Hercule Poirot mystery', 2, 2, 6, 6),
-(18, '1984', '9780451524935', 1949, 'A dystopian novel by George Orwell', 3, 3, 7, 7),
-(19, 'Dune', '9780441172719', 1965, 'A science fiction novel by Frank Herbert', 2, 2, 7, 8),
-(20, 'Pride and Prejudice', '9780141439518', 1813, 'A classic novel by Jane Austen', 2, 2, 5, 10),
-(21, 'Foundation', '9780553293357', 1951, 'A science fiction novel by Isaac Asimov', 2, 2, 7, 11),
-(22, 'The Fellowship of the Ring', '9780547928210', 1954, 'The first volume of The Lord of the Rings', 3, 3, 4, 4);
+(`id`, `title`, `isbn`, `publication_year`, `description`, `total_copies`, `available_copies`, `category_id`, `author_id`, `created_at`) VALUES
+(15, 'Derviš i smrt', '9789958200001', 1966, 'Roman Meše Selimovića o vjeri, pravdi, vlasti i ljudskoj prirodi.', 5, 5, 4, 4, '2026-10-29 19:28:42'),
+(16, 'Na Drini ćuprija', '9789958200002', 1945, 'Historijski roman Ive Andrića o mostu u Višegradu i životima ljudi kroz različite epohe.', 4, 4, 4, 5, '2026-10-29 19:28:42'),
+(17, 'Tvrđava', '9789958200003', 1970, 'Roman Meše Selimovića o ljubavi, društvu i ljudskoj odgovornosti.', 3, 3, 4, 4, '2026-10-29 19:28:42'),
+(18, 'Ježeva kućica', '9789958200004', 1949, 'Poznato djelo Branka Ćopića o domu i pripadnosti.', 5, 5, 7, 6, '2026-10-29 19:28:42'),
+(19, 'Prokleta avlija', '9789958200005', 1954, 'Djelo Ive Andrića koje istražuje vlast, zatočeništvo i ljudsku prirodu.', 3, 3, 4, 5, '2026-10-29 19:28:42'),
+(20, 'Gospoda Glembajevi', '9789958200006', 1929, 'Drama Miroslava Krleže o porodici, bogatstvu i društvenom licemjerju.', 2, 2, 5, 7, '2026-10-29 19:28:42'),
+(21, 'U registraturi', '9789958200007', 1888, 'Roman Ante Kovačića o obrazovanju, ambiciji i društvenim prilikama.', 3, 3, 5, 8, '2026-10-29 19:28:42'),
+(22, 'Seobe', '9789958200008', 1929, 'Roman Miloša Crnjanskog o migracijama, identitetu i istoriji.', 4, 4, 6, 9, '2026-10-29 19:28:42'),
+(23, 'Koreni', '9789958200009', 1954, 'Roman Dobrice Ćosića o porodici, tradiciji i sukobima u društvu.', 3, 3, 6, 10, '2026-10-29 19:28:42'),
+(24, 'Hazarski rečnik', '9789958200010', 1984, 'Postmoderni roman Milorada Pavića predstavljen u obliku rječnika.', 2, 2, 6, 11, '2026-10-29 19:28:42');
 
--- Example loan (due date is 14 days after borrowed date).
+-- Sample loan and reservation records for local API demonstrations.
 INSERT INTO `loans`
 (`id`, `book_id`, `user_id`, `borrowed_date`, `due_date`, `returned_date`, `status`) VALUES
-(1, 16, 3, '2026-10-16', '2026-10-30', NULL, 'Borrowed');
+(1, 16, 3, '2026-10-16', '2026-10-30', NULL, 'Overdue');
 
--- Example reservation: ID 2 matches the test reservation discussed during development.
 INSERT INTO `reservations`
 (`id`, `user_id`, `book_id`, `reservation_date`, `status`) VALUES
 (2, 3, 15, '2026-10-29 12:00:00', 'Cancelled');
 
--- Reset AUTO_INCREMENT values above the inserted IDs.
+-- Preserve the next available IDs from this seed dataset.
 ALTER TABLE `users` AUTO_INCREMENT = 5;
 ALTER TABLE `categories` AUTO_INCREMENT = 8;
 ALTER TABLE `authors` AUTO_INCREMENT = 12;
+ALTER TABLE `books` AUTO_INCREMENT = 25;
+ALTER TABLE `loans` AUTO_INCREMENT = 2;
+ALTER TABLE `reservations` AUTO_INCREMENT = 3;

@@ -1,14 +1,23 @@
-backend/logs/*
-!backend/logs/.gitkeep
-
+# Local environment and secrets
 .env
 .env.*
-!.env.example
+!/backend/config/.env.example
+/backend/config/config.php
 
-backend/config/.env
-backend/config/config.php
+# Composer dependencies
+/backend/vendor/
 
-vendor/
-node_modules/
-.DS_Store
+# Runtime logs (keep only the directory marker and access rules)
+/backend/logs/*
+!/backend/logs/.gitkeep
+!/backend/logs/.htaccess
+
+# IDE / operating system files
+.vscode/
 .idea/
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.bak

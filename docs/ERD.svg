@@ -1,1 +1,90 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1140" height="920" viewBox="0 0 1140 920"><rect width="1140" height="920" fill="#f7f8f4"/><style>text{font-family:Arial;fill:#263c35}.name{fill:white;font-size:17px;font-weight:bold}.field{font-size:13px}.edge{fill:none;stroke:#84967d;stroke-width:2}</style><text x="40" y="34" font-size="24">BookNest · Draft Entity-Relationship Diagram</text><path class="edge" d="M340 140H410"/><text x="355" y="128" font-size="12">1 : N</text><path class="edge" d="M190 258V350"/><text x="200" y="305" font-size="12">1 : N</text><path class="edge" d="M710 140H780"/><text x="725" y="128" font-size="12">N : 1</text><path class="edge" d="M930 258V350"/><text x="940" y="305" font-size="12">N : 1</text><path class="edge" d="M340 440H410"/><text x="355" y="425" font-size="12">N : 1</text><path class="edge" d="M560 350V295H750V218H780"/><text x="610" y="286" font-size="12">N : 1</text><path class="edge" d="M930 538V640"/><text x="940" y="590" font-size="12">1 : N</text><path class="edge" d="M710 725H780"/><text x="725" y="710" font-size="12">1 : N</text><rect x="40" y="70" width="300" height="188" rx="10" fill="white" stroke="#cdd8c7"/><path d="M50 70h280q10 0 10 10v31H40v-31q0-10 10-10" fill="#244e42"/><text class="name" x="56" y="97">USERS</text><text class="field" x="56" y="138">PK user_id</text><text class="field" x="56" y="161">UK email</text><text class="field" x="56" y="184">full_name, password_hash</text><text class="field" x="56" y="207">phone, role, status, created_at</text><rect x="410" y="70" width="300" height="188" rx="10" fill="white" stroke="#cdd8c7"/><path d="M420 70h280q10 0 10 10v31H410v-31q0-10 10-10" fill="#244e42"/><text class="name" x="426" y="97">RESERVATIONS</text><text class="field" x="426" y="138">PK reservation_id</text><text class="field" x="426" y="161">FK user_id → USERS</text><text class="field" x="426" y="184">FK book_id → BOOKS</text><text class="field" x="426" y="207">reserved_at, expires_at, status</text><rect x="780" y="70" width="300" height="188" rx="10" fill="white" stroke="#cdd8c7"/><path d="M790 70h280q10 0 10 10v31H780v-31q0-10 10-10" fill="#244e42"/><text class="name" x="796" y="97">BOOKS</text><text class="field" x="796" y="138">PK book_id</text><text class="field" x="796" y="161">FK category_id → CATEGORIES</text><text class="field" x="796" y="184">UK isbn; title; description</text><text class="field" x="796" y="207">publication_year, cover_url</text><rect x="40" y="350" width="300" height="188" rx="10" fill="white" stroke="#cdd8c7"/><path d="M50 350h280q10 0 10 10v31H40v-31q0-10 10-10" fill="#244e42"/><text class="name" x="56" y="377">LOANS</text><text class="field" x="56" y="418">PK loan_id</text><text class="field" x="56" y="441">FK user_id → USERS</text><text class="field" x="56" y="464">FK copy_id → BOOK_COPIES</text><text class="field" x="56" y="487">borrowed_at, due_at</text><text class="field" x="56" y="510">returned_at, renewal_count</text><rect x="410" y="350" width="300" height="188" rx="10" fill="white" stroke="#cdd8c7"/><path d="M420 350h280q10 0 10 10v31H410v-31q0-10 10-10" fill="#244e42"/><text class="name" x="426" y="377">BOOK_COPIES</text><text class="field" x="426" y="418">PK copy_id</text><text class="field" x="426" y="441">FK book_id → BOOKS</text><text class="field" x="426" y="464">UK barcode</text><text class="field" x="426" y="487">shelf_location, status</text><rect x="780" y="350" width="300" height="188" rx="10" fill="white" stroke="#cdd8c7"/><path d="M790 350h280q10 0 10 10v31H780v-31q0-10 10-10" fill="#244e42"/><text class="name" x="796" y="377">CATEGORIES</text><text class="field" x="796" y="418">PK category_id</text><text class="field" x="796" y="441">UK name</text><rect x="410" y="640" width="300" height="188" rx="10" fill="white" stroke="#cdd8c7"/><path d="M420 640h280q10 0 10 10v31H410v-31q0-10 10-10" fill="#244e42"/><text class="name" x="426" y="667">AUTHORS</text><text class="field" x="426" y="708">PK author_id</text><text class="field" x="426" y="731">name</text><rect x="780" y="640" width="300" height="188" rx="10" fill="white" stroke="#cdd8c7"/><path d="M790 640h280q10 0 10 10v31H780v-31q0-10 10-10" fill="#244e42"/><text class="name" x="796" y="667">BOOK_AUTHORS</text><text class="field" x="796" y="708">PK,FK book_id → BOOKS</text><text class="field" x="796" y="731">PK,FK author_id → AUTHORS</text><text x="40" y="870" font-size="13">1 : N = one-to-many. BOOK_AUTHORS resolves the Books–Authors many-to-many relationship.</text><text x="40" y="895" font-size="12">Draft only · Full attributes, optionality and business rules: docs/ERD.md · PK = primary key; FK = foreign key; UK = unique.</text></svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="1180" height="1030" viewBox="0 0 1180 1030" role="img" aria-labelledby="title desc">
+<title id="title">BookNest implemented database ERD</title>
+<desc id="desc">Six-table entity relationship diagram for users, authors, categories, books, loans and reservations.</desc>
+<rect width="1180" height="1030" fill="#f7f8f4"/>
+<style>
+  text{font-family:Arial,Helvetica,sans-serif;fill:#263c35}
+  .heading{font-size:27px;font-weight:700}
+  .subheading{font-size:14px;fill:#64756c}
+  .table{fill:#fff;stroke:#cbd6ce;stroke-width:1.5}
+  .tablehead{fill:#244e42}
+  .name{fill:#fff;font-size:18px;font-weight:700;letter-spacing:.4px}
+  .field{font-size:13px}
+  .edge{fill:none;stroke:#82968b;stroke-width:2.4}
+  .relation{font-size:12px;font-weight:700;fill:#52665c}
+  .legend{font-size:12px;fill:#52665c}
+</style>
+<text class="heading" x="48" y="48">BookNest · Implemented database schema</text>
+<text class="subheading" x="48" y="75">Six MySQL tables · Primary keys (PK), foreign keys (FK), unique keys (UK)</text>
+
+<!-- Relationship connectors behind the tables -->
+<path class="edge" d="M550 274 V320 H550 V365"/><text class="relation" x="565" y="323">1 : N</text>
+<path class="edge" d="M895 274 V320 H650 V365"/><text class="relation" x="820" y="309">1 : N</text>
+<path class="edge" d="M205 575 V675"/><text class="relation" x="218" y="625">1 : N</text>
+<path class="edge" d="M405 505 H375 V770 H350"/><text class="relation" x="360" y="650">1 : N</text>
+<path class="edge" d="M690 505 H720 V770 H750"/><text class="relation" x="700" y="650">1 : N</text>
+<path class="edge" d="M60 520 H25 V910 H895 V865"/><text class="relation" x="485" y="902">1 : N (reservations)</text>
+
+<!-- AUTHORS -->
+<rect class="table" x="405" y="94" width="290" height="180" rx="10"/>
+<path class="tablehead" d="M415 94 H685 Q695 94 695 104 V137 H405 V104 Q405 94 415 94 Z"/>
+<text class="name" x="425" y="123">AUTHORS</text>
+<text class="field" x="425" y="163">PK  id</text>
+<text class="field" x="425" y="187">first_name</text>
+<text class="field" x="425" y="211">last_name</text>
+<text class="field" x="425" y="235">biography</text>
+
+<!-- CATEGORIES -->
+<rect class="table" x="750" y="94" width="290" height="180" rx="10"/>
+<path class="tablehead" d="M760 94 H1030 Q1040 94 1040 104 V137 H750 V104 Q750 94 760 94 Z"/>
+<text class="name" x="770" y="123">CATEGORIES</text>
+<text class="field" x="770" y="163">PK  id</text>
+<text class="field" x="770" y="187">UK  name</text>
+<text class="field" x="770" y="211">description</text>
+
+<!-- USERS -->
+<rect class="table" x="60" y="365" width="290" height="210" rx="10"/>
+<path class="tablehead" d="M70 365 H340 Q350 365 350 375 V408 H60 V375 Q60 365 70 365 Z"/>
+<text class="name" x="80" y="394">USERS</text>
+<text class="field" x="80" y="434">PK  id</text>
+<text class="field" x="80" y="458">full_name</text>
+<text class="field" x="80" y="482">UK  email</text>
+<text class="field" x="80" y="506">password</text>
+<text class="field" x="80" y="530">role · created_at</text>
+
+<!-- BOOKS -->
+<rect class="table" x="405" y="365" width="285" height="225" rx="10"/>
+<path class="tablehead" d="M415 365 H680 Q690 365 690 375 V408 H405 V375 Q405 365 415 365 Z"/>
+<text class="name" x="425" y="394">BOOKS</text>
+<text class="field" x="425" y="434">PK  id</text>
+<text class="field" x="425" y="458">title · UK isbn</text>
+<text class="field" x="425" y="482">publication_year · description</text>
+<text class="field" x="425" y="506">total_copies · available_copies</text>
+<text class="field" x="425" y="530">FK  author_id → AUTHORS</text>
+<text class="field" x="425" y="554">FK  category_id → CATEGORIES</text>
+<text class="field" x="425" y="578">created_at</text>
+
+<!-- LOANS -->
+<rect class="table" x="60" y="675" width="290" height="190" rx="10"/>
+<path class="tablehead" d="M70 675 H340 Q350 675 350 685 V718 H60 V685 Q60 675 70 675 Z"/>
+<text class="name" x="80" y="704">LOANS</text>
+<text class="field" x="80" y="744">PK  id</text>
+<text class="field" x="80" y="768">FK  book_id → BOOKS</text>
+<text class="field" x="80" y="792">FK  user_id → USERS</text>
+<text class="field" x="80" y="816">borrowed_date · due_date</text>
+<text class="field" x="80" y="840">returned_date · status</text>
+
+<!-- RESERVATIONS -->
+<rect class="table" x="750" y="675" width="290" height="190" rx="10"/>
+<path class="tablehead" d="M760 675 H1030 Q1040 675 1040 685 V718 H750 V685 Q750 675 760 675 Z"/>
+<text class="name" x="770" y="704">RESERVATIONS</text>
+<text class="field" x="770" y="744">PK  id</text>
+<text class="field" x="770" y="768">FK  user_id → USERS</text>
+<text class="field" x="770" y="792">FK  book_id → BOOKS</text>
+<text class="field" x="770" y="816">reservation_date</text>
+<text class="field" x="770" y="840">status</text>
+
+<line x1="60" y1="950" x2="1120" y2="950" stroke="#d5ded7"/>
+<text class="legend" x="60" y="978">1 : N = one-to-many. A book has zero or one author/category because those foreign keys are nullable.</text>
+<text class="legend" x="60" y="1002">This diagram matches backend/database/booknest.sql and the DAO classes. BOOK_COPIES and BOOK_AUTHORS are not implemented tables.</text>
+</svg>

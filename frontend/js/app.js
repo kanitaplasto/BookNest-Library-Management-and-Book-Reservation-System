@@ -557,49 +557,110 @@ async function navigate() {
             }
         }
 
-        // Discover
+        // Discover - search external book catalogues through the BookNest backend.
         if (route === 'discover') {
-            const search = () => {
-                const searchInput =
-                    document.querySelector('#discover-search');
+            const searchInput = document.querySelector('#discover-search');
+            const discoverButton = document.querySelector('#discover-button');
+            const results = document.querySelector('#discover-results');
+            const count = document.querySelector('#discover-count');
+            const externalBooksUrl = '../backend/api/external/books';
 
-                const results =
-                    document.querySelector('#discover-results');
+            const externalBookCard = book => {
+                const title = esc(book.title || 'Untitled book');
+                const author = esc(
+                    Array.isArray(book.authors) && book.authors.length
+                        ? book.authors.join(', ')
+                        : 'Unknown author'
+                );
+                const year = esc(book.publishedDate || 'Publication date unavailable');
+                const publisher = esc(book.publisher || 'Publisher unavailable');
+                const description = esc(
+                    book.description
+                        ? book.description.slice(0, 240) + (book.description.length > 240 ? '…' : '')
+                        : 'No description is available for this title.'
+                );
+                const thumbnail = /^https:\/\//i.test(book.thumbnail || '')
+                    ? `<img class="external-book-cover" src="${esc(book.thumbnail)}" alt="Cover of ${title}" loading="lazy">`
+                    : '<div class="external-book-cover-placeholder">BookNest</div>';
+                const infoLink = /^https?:\/\//i.test(book.infoLink || '')
+                    ? `<a class="button secondary" href="${esc(book.infoLink)}" target="_blank" rel="noopener noreferrer">View source record</a>`
+                    : '';
 
-                if (!searchInput || !results) {
+                return `
+                    <article class="book external-book-card">
+                        ${thumbnail}
+                        <div class="external-book-content">
+                            <h3>${title}</h3>
+                            <p class="sub">${author}</p>
+                            <p class="muted">${year} · ${publisher}</p>
+                            <p>${description}</p>
+                            ${infoLink}
+                        </div>
+                    </article>
+                `;
+            };
+
+            const search = async () => {
+                if (!searchInput || !results || !count) {
                     return;
                 }
 
-                const q = searchInput.value.toLowerCase().trim();
+                const query = searchInput.value.trim();
+                if (!query) {
+                    count.textContent = 'Enter a title, author, or ISBN to start searching.';
+                    results.innerHTML = '';
+                    searchInput.focus();
+                    return;
+                }
 
-                results.innerHTML = cards(
-                    books.filter(b =>
-                        (b.title + ' ' + b.author)
-                            .toLowerCase()
-                            .includes(q)
-                    ).slice(0, 4)
-                );
+                results.innerHTML = '<p class="empty">Searching external book catalogues…</p>';
+                count.textContent = 'Connecting to the external book catalogue…';
+                if (discoverButton) discoverButton.disabled = true;
+
+                try {
+                    const response = await fetch(
+                        `${externalBooksUrl}?q=${encodeURIComponent(query)}&maxResults=12`,
+                        {
+                            method: 'GET',
+                            headers: { 'Accept': 'application/json' },
+                            cache: 'no-store'
+                        }
+                    );
+                    const payload = await response.json();
+
+                    if (!response.ok || !payload.success) {
+                        throw new Error(payload.error || `Search failed (HTTP ${response.status}).`);
+                    }
+
+                    const data = payload.data || {};
+                    const items = Array.isArray(data.items) ? data.items : [];
+
+                    count.textContent = `${Number(data.totalItems || 0).toLocaleString()} matching books found on ${data.source || 'the external catalogue'}.`;
+                    results.innerHTML = items.length
+                        ? items.map(externalBookCard).join('')
+                        : '<p class="empty">No books found. Try another title, author, or ISBN.</p>';
+                } catch (error) {
+                    console.error('External book search failed:', error);
+                    count.textContent = 'The external book catalogue could not be reached.';
+                    results.innerHTML = `
+                        <p class="empty">
+                            ${esc(error.message || 'Book search is temporarily unavailable. Please try again later.')}
+                        </p>
+                    `;
+                } finally {
+                    if (discoverButton) discoverButton.disabled = false;
+                }
             };
-
-            const discoverButton =
-                document.querySelector('#discover-button');
-
-            const discoverSearch =
-                document.querySelector('#discover-search');
 
             if (discoverButton) {
                 discoverButton.onclick = search;
             }
 
-            if (discoverSearch) {
-                discoverSearch.onkeydown = e => {
-                    if (e.key === 'Enter') {
-                        search();
-                    }
+            if (searchInput) {
+                searchInput.onkeydown = event => {
+                    if (event.key === 'Enter') search();
                 };
             }
-
-            search();
         }
 
         // Profile

@@ -54,6 +54,37 @@ class ReservationDAO extends BaseDAO
         return $this->fetchAll($sql, [$userId]);
     }
 
+    public function hasActiveReservation($userId, $bookId, $excludeId = null)
+    {
+        $sql = "SELECT COUNT(*)
+                FROM reservations
+                WHERE user_id = ? AND book_id = ?
+                  AND status IN ('Queued', 'Ready')";
+        $parameters = [$userId, $bookId];
+
+        if ($excludeId !== null) {
+            $sql .= " AND id <> ?";
+            $parameters[] = $excludeId;
+        }
+
+        return (int) $this->executeQuery($sql, $parameters)->fetchColumn() > 0;
+    }
+
+    public function countActiveByUser($userId, $excludeId = null)
+    {
+        $sql = "SELECT COUNT(*)
+                FROM reservations
+                WHERE user_id = ? AND status IN ('Queued', 'Ready')";
+        $parameters = [$userId];
+
+        if ($excludeId !== null) {
+            $sql .= " AND id <> ?";
+            $parameters[] = $excludeId;
+        }
+
+        return (int) $this->executeQuery($sql, $parameters)->fetchColumn();
+    }
+
     public function create($data)
     {
         $sql = "INSERT INTO reservations
@@ -70,20 +101,36 @@ class ReservationDAO extends BaseDAO
         return $this->connection->lastInsertId();
     }
 
-    public function updateStatus($id, $status)
+    public function update($id, $data)
     {
         $sql = "UPDATE reservations
-                SET status = ?
+                SET user_id = ?, book_id = ?, status = ?
                 WHERE id = ?";
 
-        $this->executeQuery($sql, [$status, $id]);
+        $statement = $this->executeQuery($sql, [
+            $data['user_id'],
+            $data['book_id'],
+            $data['status'],
+            $id
+        ]);
+
+        return $statement->rowCount();
+    }
+
+    public function updateStatus($id, $status)
+    {
+        $sql = "UPDATE reservations SET status = ? WHERE id = ?";
+        $statement = $this->executeQuery($sql, [$status, $id]);
+        return $statement->rowCount();
     }
 
     public function delete($id)
     {
-        $sql = "DELETE FROM reservations
-                WHERE id = ?";
-
-        $this->executeQuery($sql, [$id]);
+        $statement = $this->executeQuery(
+            "DELETE FROM reservations WHERE id = ?",
+            [$id]
+        );
+        return $statement->rowCount();
     }
+
 }

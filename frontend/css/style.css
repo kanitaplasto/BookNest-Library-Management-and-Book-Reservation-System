@@ -662,3 +662,55 @@ select:focus-visible {
         padding: 15px;
     }
 }
+
+/* External book-search results displayed on the Discover page. */
+.external-book-card {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    padding: 1rem;
+}
+
+.external-book-cover,
+.external-book-cover-placeholder {
+    width: 104px;
+    min-width: 104px;
+    height: 150px;
+    object-fit: contain;
+    border-radius: 8px;
+    background: #edf1ee;
+}
+
+.external-book-cover-placeholder {
+    display: grid;
+    place-items: center;
+    color: #244e42;
+    font-weight: 700;
+    font-size: 0.9rem;
+}
+
+.external-book-content {
+    min-width: 0;
+}
+
+.external-book-content h3 {
+    margin-top: 0;
+}
+
+.external-book-content p {
+    overflow-wrap: anywhere;
+}
+
+@media (max-width: 520px) {
+    .external-book-card {
+        gap: 0.75rem;
+        padding: 0.75rem;
+    }
+
+    .external-book-cover,
+    .external-book-cover-placeholder {
+        width: 76px;
+        min-width: 76px;
+        height: 112px;
+    }
+}

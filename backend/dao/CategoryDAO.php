@@ -21,6 +21,15 @@ class CategoryDAO extends BaseDAO
         return $this->fetchOne($sql, [$id]);
     }
 
+    public function getByName($name)
+    {
+        $sql = "SELECT id, name, description
+                FROM categories
+                WHERE name = ?";
+
+        return $this->fetchOne($sql, [$name]);
+    }
+
     public function create($data)
     {
         $sql = "INSERT INTO categories (name, description)

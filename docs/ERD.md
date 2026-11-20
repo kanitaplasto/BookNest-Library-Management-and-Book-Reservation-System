@@ -1,86 +1,83 @@
-# BookNest — draft database schema
+# BookNest — Implemented Entity-Relationship Diagram
 
-Planning only; no database connection or migrations are required in Milestone 1.
+This ERD describes the six tables that are actually implemented in `backend/database/booknest.sql` and used by the DAO and service layers. It replaces the earlier planning draft that included `BOOK_COPIES` and `BOOK_AUTHORS`; those are not separate tables in the current application.
 
 ```mermaid
 erDiagram
-    USERS ||--o{ RESERVATIONS : places
     USERS ||--o{ LOANS : borrows
-    BOOKS ||--o{ BOOK_COPIES : has
-    BOOKS ||--o{ RESERVATIONS : requested
-    BOOK_COPIES ||--o{ LOANS : loaned
-    CATEGORIES ||--o{ BOOKS : classifies
-    BOOKS ||--o{ BOOK_AUTHORS : has
-    AUTHORS ||--o{ BOOK_AUTHORS : writes
+    BOOKS ||--o{ LOANS : appears_in
+    USERS ||--o{ RESERVATIONS : places
+    BOOKS ||--o{ RESERVATIONS : is_reserved
+    AUTHORS o|--o{ BOOKS : writes
+    CATEGORIES o|--o{ BOOKS : classifies
+
     USERS {
-        int user_id PK
+        int id PK
         varchar full_name
         varchar email UK
-        varchar password_hash
-        varchar phone
+        varchar password
         enum role
-        enum status
-        datetime created_at
-    }
-    BOOKS {
-        int book_id PK
-        int category_id FK
-        varchar isbn UK
-        varchar title
-        text description
-        int publication_year
-        varchar cover_url
-    }
-    BOOK_COPIES {
-        int copy_id PK
-        int book_id FK
-        varchar barcode UK
-        varchar shelf_location
-        enum status
+        timestamp created_at
     }
     AUTHORS {
-        int author_id PK
-        varchar name
-    }
-    BOOK_AUTHORS {
-        int book_id PK,FK
-        int author_id PK,FK
+        int id PK
+        varchar first_name
+        varchar last_name
+        text biography
     }
     CATEGORIES {
-        int category_id PK
+        int id PK
         varchar name UK
+        text description
     }
-    RESERVATIONS {
-        int reservation_id PK
-        int user_id FK
-        int book_id FK
-        datetime reserved_at
-        datetime expires_at
-        enum status
+    BOOKS {
+        int id PK
+        varchar title
+        varchar isbn UK
+        int publication_year
+        text description
+        int total_copies
+        int available_copies
+        int category_id FK
+        int author_id FK
+        timestamp created_at
     }
     LOANS {
-        int loan_id PK
+        int id PK
+        int book_id FK
         int user_id FK
-        int copy_id FK
-        datetime borrowed_at
-        datetime due_at
-        datetime returned_at
-        int renewal_count
+        date borrowed_date
+        date due_date
+        date returned_date
+        enum status
+    }
+    RESERVATIONS {
+        int id PK
+        int user_id FK
+        int book_id FK
+        timestamp reservation_date
+        enum status
     }
 ```
 
-## Design decisions
+## Relationships
 
-- Eight entities, including the BOOK_AUTHORS junction table. A book may have several authors and an author may write several books.
-- A category has zero or more books; each book has one category. Categories provide a simple primary classification.
-- BOOKS describes a title/edition; BOOK_COPIES represents individual physical copies. ISBN is unique per edition and may be nullable for legacy books. Barcode uniquely identifies a copy.
-- Reservations target a title, not a physical copy. The backend will allocate an available copy when processing the queue. A user and book can have many historical reservations.
-- Loans target a copy. A copy can have many historical loans but at most one active loan (returned_at IS NULL). Enforce this in a transaction, with a database constraint where supported.
-- USERS.role: member or librarian. USERS.status: active or suspended. Authentication and authorization are future backend work.
-- Copy status: available, on_loan, held or maintenance. Reservation status: pending, ready, collected, cancelled or expired. Frontend availability labels are simplified aggregates, not stored book status fields.
-- Prevent duplicate active reservations for the same user/title. Validate reservation limits, FIFO queue processing, due dates and renewals in the service layer.
-- Dates: expires_at and returned_at may be NULL. Due date must be after borrowed_at; returned_at cannot precede borrowed_at.
-- Preserve loan/reservation history: restrict deletion of referenced users, books and copies; use inactive/archive states instead. Junction records may cascade on author/book deletion only when allowed.
-- Passwords must be hashed in the backend; never store plaintext passwords. Email is unique and normalized. IDs use integer primary keys; foreign keys are indexed.
+- One user can have many loans; every loan references exactly one user.
+- One book can appear in many loans; every loan references exactly one book.
+- One user can place many reservations; every reservation references exactly one user.
+- One book can have many reservations; every reservation references exactly one book.
+- One author can be linked to many books. A book can have zero or one author because `books.author_id` is nullable.
+- One category can contain many books. A book can have zero or one category because `books.category_id` is nullable.
 
-Open `ERD.svg` for a standalone visual diagram, or preview this file in GitHub for the detailed Mermaid ERD.
+## Database rules represented in SQL
+
+- `users.email`, `categories.name`, and `books.isbn` are unique (ISBN may be NULL).
+- `books.available_copies` must be between zero and `books.total_copies`.
+- Loan `due_date` cannot be earlier than `borrowed_date`.
+- Deleting an author or category sets the related book foreign key to NULL.
+- Deleting a user or book cascades to its related loans and reservations in this current schema.
+- User roles are `member` and `librarian`.
+- Loan statuses are `Borrowed`, `Returned`, and `Overdue`.
+- Reservation statuses are `Queued`, `Ready`, `Completed`, and `Cancelled`.
+
+Open `ERD.svg` for the visual version of this same six-table schema.

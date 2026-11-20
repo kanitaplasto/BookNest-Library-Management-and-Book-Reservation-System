@@ -25,6 +25,17 @@ class BookDAO extends BaseDAO
         return $this->fetchOne($sql, [$id]);
     }
 
+    public function getByIsbn($isbn)
+    {
+        $sql = "SELECT id, title, isbn, publication_year, description,
+                       total_copies, available_copies, author_id,
+                       category_id, created_at
+                FROM books
+                WHERE isbn = ?";
+
+        return $this->fetchOne($sql, [$isbn]);
+    }
+
     public function create($data)
     {
         $sql = "INSERT INTO books
